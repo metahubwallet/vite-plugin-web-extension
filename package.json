@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-web-extension",
+  "name": "vite-plugin-web-extension-support-inject",
   "version": "5.0.0",
   "description": "A vite plugin for generating cross browser platform, ES module based web extensions",
   "main": "./dist/index.cjs",
