@@ -222,7 +222,13 @@ export default abstract class ManifestParser<
     const parseResult =
       chunkInfo.type === "asset"
         ? this.parseOutputAsset(type, fileName, chunkInfo, result, bundle)
-        : this.parseOutputChunk(fileName, chunkInfo, result, bundle);
+        : this.parseOutputChunk(
+            fileName,
+            chunkInfo,
+            result,
+            bundle,
+            webAccessible?.isInject
+          );
 
     if (webAccessible === null) {
       parseResult.webAccessibleFiles.clear();
@@ -262,11 +268,13 @@ export default abstract class ManifestParser<
     inputFileName: string,
     outputChunk: OutputChunk,
     result: ParseResult<Manifest>,
-    bundle: OutputBundle
+    bundle: OutputBundle,
+    isInject = false
   ): { fileName: string; webAccessibleFiles: Set<string> } {
     const scriptLoaderFile = getScriptLoaderForOutputChunk(
       inputFileName,
-      outputChunk
+      outputChunk,
+      isInject
     );
 
     const metadata = this.getMetadataforChunk(

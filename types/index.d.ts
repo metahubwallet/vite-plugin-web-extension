@@ -5,11 +5,13 @@ type WebAccessibleDefinition =
       matches: string[];
       extensionIds?: string[];
       excludeEntryFile?: boolean;
+      isInject?: boolean;
     }
   | {
       matches?: string[];
       extensionIds: string[];
       excludeEntryFile?: boolean;
+      isInject?: boolean;
     };
 
 type AdditionalInput =

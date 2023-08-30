@@ -176,13 +176,16 @@ export default abstract class DevBuilder<
     }
   }
 
-  protected async writeManifestScriptFile(fileName: string): Promise<string> {
+  protected async writeManifestScriptFile(
+    fileName: string,
+    isInject = false
+  ): Promise<string> {
     const outputFileName = getOutputFileName(fileName);
-
-    const scriptLoaderFile = getScriptLoaderFile(outputFileName, [
-      this.hmrViteClientUrl,
-      `${this.hmrServerOrigin}/${fileName}`,
-    ]);
+    const scriptLoaderFile = getScriptLoaderFile(
+      outputFileName,
+      [this.hmrViteClientUrl, `${this.hmrServerOrigin}/${fileName}`],
+      isInject
+    );
 
     const outFile = `${this.outDir}/${scriptLoaderFile.fileName}`;
 
@@ -275,7 +278,10 @@ export default abstract class DevBuilder<
         );
         break;
       case "scripts":
-        outputFileName = await this.writeManifestScriptFile(fileName);
+        outputFileName = await this.writeManifestScriptFile(
+          fileName,
+          webAccessible?.isInject
+        );
         break;
       case "styles":
         const cssFileName = `${getOutputFileName(fileName)}.css`;

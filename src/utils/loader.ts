@@ -16,7 +16,8 @@ export function getScriptHtmlLoaderFile(name: string, scriptSrcs: string[]) {
 
 export function getScriptLoaderFile(
   scriptFileName: string,
-  inputFileNames: string[]
+  inputFileNames: string[],
+  isInject = false
 ): {
   fileName: string;
   source: string;
@@ -26,16 +27,22 @@ export function getScriptLoaderFile(
   const importStatements = inputFileNames
     .filter((fileName) => Boolean(fileName))
     .map((fileName) => {
-      return fileName.startsWith("http")
-        ? `"${fileName}"`
-        : `chrome.runtime.getURL("${fileName}")`;
+      if (isInject) {
+        return `"${"../".repeat(outputFile.split("/").length - 1) + fileName}"`;
+      } else {
+        return fileName.startsWith("http")
+          ? `"${fileName}"`
+          : `chrome.runtime.getURL("${fileName}")`;
+      }
     })
-    .map((importPath) => `await import(${importPath})`)
+    .map((importPath) =>
+      isInject ? `import ${importPath}` : `await import(${importPath})`
+    )
     .join(";");
 
   return {
     fileName: `${outputFile}.js`,
-    source: `(async()=>{${importStatements}})();`,
+    source: isInject ? importStatements : `(async()=>{${importStatements}})();`,
   };
 }
 
@@ -56,11 +63,11 @@ export function getServiceWorkerLoaderFile(inputFileNames: string[]) {
 
 export function getScriptLoaderForOutputChunk(
   contentScriptFileName: string,
-  chunk: OutputChunk
+  chunk: OutputChunk,
+  isInject = false
 ): { fileName: string; source: string } | null {
   if (!chunk.imports.length && !chunk.dynamicImports.length) {
     return null;
   }
-
-  return getScriptLoaderFile(contentScriptFileName, [chunk.fileName]);
+  return getScriptLoaderFile(contentScriptFileName, [chunk.fileName], isInject);
 }
